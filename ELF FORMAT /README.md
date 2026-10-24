@@ -3,14 +3,14 @@
 ## Introduction 
 
 <img width="680" height="1135" alt="image" src="https://github.com/user-attachments/assets/5856ea20-7286-4852-80ae-0a43385c2d69" />
-##Compilation 
+## Compilation 
 <img width="690" height="205" alt="image" src="https://github.com/user-attachments/assets/a6fa69c5-ed8d-4ec3-96bc-3ae72ad583aa" />
-##Executable Headers(Ehdr)
+## Executable Headers(Ehdr)
 -đây là phần đầu của têp
 -nó sẽ định nghĩa một thông tin cơ bản của file, giống như một file magic number dùng để nhận biết một file ELF hay là một kiểu file khác .
 Ngoài ra nó còn xác định loại của ELF, kiến trúc và một số option mà liên kết nó với các phần khác của ELF file.
 32-bit struct:
-'''c
+```c
 #define EI_NIDENT (16)
 
 typedef struct
@@ -30,9 +30,9 @@ typedef struct
   Elf32_Half	e_shnum;		/* Section header table entry count */
   Elf32_Half	e_shstrndx;		/* Section header string table index */
 } Elf32_Ehdr;
-'''
+```
 64-bit struct:
-'''c
+```c
 typedef struct
 {
   unsigned char	e_ident[EI_NIDENT];	/* Magic number and other info */
@@ -50,7 +50,7 @@ typedef struct
   Elf64_Half	e_shnum;		/* Section header table entry count */
   Elf64_Half	e_shstrndx;		/* Section header string table index */
 } Elf64_Ehdr;
-'''
+```
 EI_NIDENT  là kích thước trong byte của mục nhập cấu trúc đầu tiên ,e_type
 Đây là ELF magic headers va một số thông số kỹ thuật cơ bản của file
 Values:
@@ -78,7 +78,7 @@ Values:
 - Note: e_phoff và e_shoff là offsets của ELF file, e_entry thay vào đó là một địa chỉ ảo
 
 - định dạng e_type:
-'''c
+```c
 #define ET_NONE		0		/* No file type */
 #define ET_REL		1		/* Relocatable file */
 #define ET_EXEC		2		/* Executable file */
@@ -89,9 +89,9 @@ Values:
 #define ET_HIOS		0xfeff		/* OS-specific range end */
 #define ET_LOPROC	0xff00		/* Processor-specific range start */
 #define ET_HIPROC	0xffff		/* Processor-specific range end */
-'''
+```
 - định dạng e_machine:
-'''c
+```c
 #define EM_NONE		 0	/* No machine */
 #define EM_M32		 1	/* AT&T WE 32100 */
 #define EM_SPARC	 2	/* SUN SPARC */
@@ -293,19 +293,19 @@ Values:
    chances of collision with official or non-GNU unofficial values.  */
 
 #define EM_ALPHA	0x9026
-  '''
+```
 e_version denfines:
-'''c
+```c
 #define EV_NONE		  0		/* Invalid ELF version */
 #define EV_CURRENT	1		/* Current version */
 #define EV_NUM		  2
-'''
-##Section Header (Shdr)
+```
+## Section Header (Shdr)
 Các đoạn code và dữ liệu được chia thành các chunk liên tiếp nhau được gọi là các section
 Nó là chỉ là một vùng không gian chứa dữ liệu hoặc code,những thông số kỹ thuật trong một section header đang chỉ định các chi tiết cần thiết như là size và offset
 Mọi section đều có một section header mà định nghĩa bản thân nó
 32-bit struct:
-'''c 
+```c 
 typedef struct
 {
   Elf32_Word	sh_name;		/* Section name (string tbl index) */
@@ -319,9 +319,9 @@ typedef struct
   Elf32_Word	sh_addralign;		/* Section alignment */
   Elf32_Word	sh_entsize;		/* Entry size if section holds table */
 } Elf32_Shdr;
-'''
+```
 64-bit struct:
-'''c
+```c
 typedef struct
 {
   Elf64_Word	sh_name;		/* Section name (string tbl index) */
@@ -335,7 +335,7 @@ typedef struct
   Elf64_Xword	sh_addralign;		/* Section alignment */
   Elf64_Xword	sh_entsize;		/* Entry size if section holds table */
 } Elf64_Shdr;
-'''
+```
 Các giá trị:
 - sh_name : Index chỉ vào bảng chuỗi,nếu bằng không thì nghĩa là không có tên (.shstrtab)
 - sh_type:kiểu của section
@@ -371,7 +371,7 @@ Tất cả section header định nghĩa section ,đều được lưu trữ tro
 Các section là thành phần tuỳ chọn; chúng chủ yếu chứa metadata cho công cụ debuggers.Program header mới là thành phần quyết định cách một ELF binary được nạp vào bộ nhớ
 Do đó section header hkoong được nạp vào bộ nhớ
 sh_type defines: 
-'''c
+```c
 #define SHT_NULL	  0		/* Section header table entry unused */
 #define SHT_PROGBITS	  1		/* Program data */
 #define SHT_SYMTAB	  2		/* Symbol table */
@@ -408,9 +408,9 @@ sh_type defines:
 #define SHT_HIPROC	  0x7fffffff	/* End of processor-specific */
 #define SHT_LOUSER	  0x80000000	/* Start of application-specific */
 #define SHT_HIUSER	  0x8fffffff	/* End of application-specific */
-'''
+```
 sh_flags defines:
-'''
+```c
 #define SHF_WRITE	     (1 << 0)	/* Writable */
 #define SHF_ALLOC	     (1 << 1)	/* Occupies memory during execution */
 #define SHF_EXECINSTR	     (1 << 2)	/* Executable */
@@ -429,8 +429,8 @@ sh_flags defines:
 					   (Solaris).  */
 #define SHF_EXCLUDE	     (1U << 31)	/* Section is excluded unless
 					   referenced or allocated (Solaris).*/
-'''
-##Section
+```
+## Section
 Theo tiêu chuẩn ELF, mục đầu tiên trong bảng tiêu đề section (section header table) của mọi tệp ELF được quy định là một mục NULL.
 Kiểu (type) của mục này là SHT_NULL, và tất cả các trường (field) trong section header đều được đặt về giá trị 0.
 sections:
@@ -465,7 +465,7 @@ Góc nhìn theo section của một tệp ELF chủ yếu phục vụ mục đí
 Ngược lại, theo segment được hệ điều hành và dynamic linker sử dụng khi nạp một tệp ELF vào tiến trình để thực thi.Góc nhìn này  cho biết các phần của tệp được tổ chức và ánh xạ vào bộ nhớ như thế nào để thực thi.
 <img width="764" height="438" alt="image" src="https://github.com/user-attachments/assets/1ae72113-c484-4226-aa35-5bb892d80a54" />
 32-bit struct:
-'''c
+```c
   typedef struct
 {
   Elf32_Word	p_type;			/* Segment type */
@@ -477,9 +477,9 @@ Ngược lại, theo segment được hệ điều hành và dynamic linker sử
   Elf32_Word	p_flags;		/* Segment flags */
   Elf32_Word	p_align;		/* Segment alignment */
 } Elf32_Phdr;
-'''
+```
 64-bit struct:
-'''c
+```c
 typedef struct
 {
   Elf64_Word	p_type;			/* Segment type */
@@ -491,7 +491,7 @@ typedef struct
   Elf64_Xword	p_memsz;		/* Segment size in memory */
   Elf64_Xword	p_align;		/* Segment alignment */
 } Elf64_Phdr;
-'''
+```
 Giá trị:
 - p_type: các loại segment
    *PT_NULL: Mục Program Header không được sử dụng. Nó thường xuất hiện ở đầu bảng Program Header, nhưng tiêu chuẩn ELF không bắt buộc nó phải là mục đầu tiên.
@@ -511,7 +511,7 @@ Giá trị:
 -p_memsz: Kích thước bộ nhớ cần cho segment để lưu vào bộ nhớ
 -p_align: xác định yêu cầu căn chỉnh của segment, tương tự trường sh_addralign trong Section Header.
 p_type defines:
-'''c
+```c
 #define	PT_NULL		0		/* Program header table entry unused */
 #define PT_LOAD		1		/* Loadable program segment */
 #define PT_DYNAMIC	2		/* Dynamic linking information */
@@ -532,16 +532,16 @@ p_type defines:
 #define PT_HIOS		0x6fffffff	/* End of OS-specific */
 #define PT_LOPROC	0x70000000	/* Start of processor-specific */
 #define PT_HIPROC	0x7fffffff	/* End of processor-specific */
-'''
+```
 p_flags defines:
-'''c
+```c
 #define PF_X		(1 << 0)	/* Segment is executable */
 #define PF_W		(1 << 1)	/* Segment is writable */
 #define PF_R		(1 << 2)	/* Segment is readable */
 #define PF_MASKOS	0x0ff00000	/* OS-specific */
 #define PF_MASKPROC	0xf0000000	/* Processor-specific */
-'''
-##Segment
+```
+## Segment
 Có 2 loại segment :
   -Text Segment:
      *.text
@@ -559,7 +559,7 @@ Có 2 loại segment :
 ## Symbols
 Symbol (ký hiệu) là một tham chiếu mang tính biểu tượng đến một loại dữ liệu hoặc mã lệnh nào đó, chẳng hạn như một biến toàn cục hoặc một hàm.
 32-bit struct:
-'''c
+```c
 typedef struct
 {
   Elf32_Word	st_name;		/* Symbol name (string tbl index) */
@@ -569,9 +569,9 @@ typedef struct
   unsigned char	st_other;		/* Symbol visibility */
   Elf32_Section	st_shndx;		/* Section index */
 } Elf32_Sym;
-'''
+```
 64-bít struct: 
-'''c
+```c
 typedef struct
 {
   Elf64_Word	st_name;		/* Symbol name (string tbl index) */
@@ -581,7 +581,7 @@ typedef struct
   Elf64_Addr	st_value;		/* Symbol value */
   Elf64_Xword	st_size;		/* Symbol size */
 } Elf64_Sym;
-'''
+```
 Giá trị:
 -st_name — Tên symbol: Chỉ số dùng để xác định tên symbol trong bảng chuỗi, thường là .strtab hoặc .dynstr. Ví dụ: main, printf, global_var.
 -st_info — Loại và phạm vi liên kết của symbol: Chứa thông tin về kiểu symbol (symbol type) và phạm vi liên kết (symbol binding). Giá trị này được giải mã bằng các macro được định nghĩa trong ELF.
@@ -614,7 +614,7 @@ st_info Values:
   *ELFN_ST_INFO(st_bind, st_type): Tạo giá trị st_info từ st_bind và st_type.
 
 -Các macro xử lý st_info
-'''c
+```c
 
 #define ELF32_ST_BIND(val)       (((unsigned char) (val)) >> 4)
 #define ELF32_ST_TYPE(val)       ((val) & 0xf)
@@ -623,7 +623,7 @@ st_info Values:
 #define ELF64_ST_BIND(val)       ELF32_ST_BIND (val)
 #define ELF64_ST_TYPE(val)       ELF32_ST_TYPE (val)
 #define ELF64_ST_INFO(bind, type) ELF32_ST_INFO ((bind), (type))
-
+```
 Ý nghĩa:
 
     ELF32_ST_BIND(val): Lấy 4 bit cao để xác định phạm vi liên kết của symbol.
@@ -632,7 +632,7 @@ st_info Values:
     Các macro ELF64 sử dụng cùng cách mã hóa này như các macro ELF32.
 
 Các giá trị của st_bind
-
+```c
 #define STB_LOCAL	0		/* Local symbol */
 #define STB_GLOBAL	1		/* Global symbol */
 #define STB_WEAK	2		/* Weak symbol */
@@ -642,9 +642,9 @@ Các giá trị của st_bind
 #define STB_HIOS	12		/* End of OS-specific */
 #define STB_LOPROC	13		/* Start of processor-specific */
 #define STB_HIPROC	15		/* End of processor-specific */
-
+```
 st_type defines:
-
+```c
 #define STT_NOTYPE	0		/* Symbol type is unspecified */
 #define STT_OBJECT	1		/* Symbol is a data object */
 #define STT_FUNC	2		/* Symbol is a code object */
@@ -658,3 +658,4 @@ st_type defines:
 #define STT_HIOS	12		/* End of OS-specific */
 #define STT_LOPROC	13		/* Start of processor-specific */
 #define STT_HIPROC	15		/* End of processor-specific */
+```
