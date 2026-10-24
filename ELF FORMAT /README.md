@@ -628,54 +628,44 @@ typedef struct
 ```
 Giá trị:
 
--st_name — Tên symbol: Chỉ số dùng để xác định tên symbol trong bảng chuỗi, thường là .strtab hoặc .dynstr. Ví dụ: main, printf, global_var.
+    -st_name — Tên symbol: Chỉ số dùng để xác định tên symbol trong bảng chuỗi, thường là .strtab hoặc .dynstr. Ví dụ: main, printf, global_var.
+    -st_info — Loại và phạm vi liên kết của symbol: Chứa thông tin về kiểu symbol (symbol type) và phạm vi liên kết (symbol binding). Giá trị này được giải mã bằng các macro được định nghĩa        trong ELF.
 
--st_info — Loại và phạm vi liên kết của symbol: Chứa thông tin về kiểu symbol (symbol type) và phạm vi liên kết (symbol binding). Giá trị này được giải mã bằng các macro được định nghĩa trong ELF.
+    -st_other — Khả năng hiển thị của symbol (symbol visibility): Xác định cách symbol có thể được truy cập hoặc nhìn thấy từ những đối tượng khác.
 
--st_other — Khả năng hiển thị của symbol (symbol visibility): Xác định cách symbol có thể được truy cập hoặc nhìn thấy từ những đối tượng khác.
+        * STV_DEFAULT: Khả năng hiển thị mặc định. Symbol có thể được truy cập từ các đối tượng khác nếu phạm vi liên kết và những điều kiện liên quan cho phép. Symbol toàn cục có thể bị thay           thế (preempted) trong một số tình huống liên kết động.
+        * STV_PROTECTED: Symbol có thể được nhìn thấy từ các đối tượng khác, nhưng các tham chiếu bên trong đối tượng định nghĩa symbol đó sẽ gắn với chính định nghĩa này, không bị thay thế             bởi định nghĩa khác.
+        * STV_HIDDEN: Symbol không được hiển thị để các đối tượng ELF khác truy cập trực tiếp thông qua cơ chế liên kết thông thường
+        * STV_INTERNAL: Mức hiển thị được dành riêng cho các mục đích đặc biệt theo quy định của nền tảng hoặc hệ thống.
 
-   * STV_DEFAULT: Khả năng hiển thị mặc định. Symbol có thể được truy cập từ các đối tượng khác nếu phạm vi liên kết và những điều kiện liên quan cho phép. Symbol toàn cục có thể bị thay thế (preempted) trong một số tình huống liên kết động.
-   
-   * STV_PROTECTED: Symbol có thể được nhìn thấy từ các đối tượng khác, nhưng các tham chiếu bên trong đối tượng định nghĩa symbol đó sẽ gắn với chính định nghĩa này, không bị thay thế bởi định nghĩa khác.
-   
-   * STV_HIDDEN: Symbol không được hiển thị để các đối tượng ELF khác truy cập trực tiếp thông qua cơ chế liên kết thông thường.
-   
-   * STV_INTERNAL: Mức hiển thị được dành riêng cho các mục đích đặc biệt theo quy định của nền tảng hoặc hệ thống.
+    -st_shndx — Chỉ số section: Xác định section liên quan đến symbol. Ví dụ, symbol của một hàm có thể thuộc section .text. Một số giá trị đặc biệt biểu thị symbol chưa được định nghĩa hoặc       không gắn với section thông thường.
 
--st_shndx — Chỉ số section: Xác định section liên quan đến symbol. Ví dụ, symbol của một hàm có thể thuộc section .text. Một số giá trị đặc biệt biểu thị symbol chưa được định nghĩa hoặc không gắn với section thông thường.
+    -st_value — Giá trị symbol: Giá trị của symbol. Tùy loại tệp ELF và loại symbol, trường này có thể biểu thị địa chỉ, độ lệch hoặc một giá trị khác theo quy định của ELF.
 
--st_value — Giá trị symbol: Giá trị của symbol. Tùy loại tệp ELF và loại symbol, trường này có thể biểu thị địa chỉ, độ lệch hoặc một giá trị khác theo quy định của ELF.
-
--st_size — Kích thước symbol: Kích thước của đối tượng mà symbol đại diện, tính bằng byte, nếu kích thước được xác định. Ví dụ, nó có thể biểu thị kích thước của một hàm hoặc biến.
+    -st_size — Kích thước symbol: Kích thước của đối tượng mà symbol đại diện, tính bằng byte, nếu kích thước được xác định. Ví dụ, nó có thể biểu thị kích thước của một hàm hoặc biến.
 
 st_info Values:
 
--st_bind: Xác định phạm vi liên kết của symbol
+    -st_bind: Xác định phạm vi liên kết của symbol
 
-  * STB_LOCAL : symbol cục bộ không được hienre thị đê các tệp đói tượng khác tham chiếu thông qua cơ ché liên kết thông thường
+       * STB_LOCAL : symbol cục bộ không được hienre thị đê các tệp đói tượng khác tham chiếu thông qua cơ ché liên kết thông thường
+       * STB_GLOBAL : Symbol toàn cục có thể được các tệp đối tượng khác tham chiếu khi chúng được liên kết với nhau, miễn là điều kiện liên kết phù hợp
+       * STB_WEAK : Symbol yếu có cách xử lý tương tự symbol toàn cục,nhưng có độ ưu tiên thấp hơn trong một số quy tắc phân giải symbol
+	   
+    -st_type: kiểu symbol
   
-  * STB_GLOBAL : Symbol toàn cục có thể được các tệp đối tượng khác tham chiếu khi chúng được liên kết với nhau, miễn là điều kiện liên kết phù hợp
-  
-  * STB_WEAK : Symbol yếu có cách xử lý tương tự symbol toàn cục,nhưng có độ ưu tiên thấp hơn trong một số quy tắc phân giải symbol
--st_type: kiểu symbol
-  
-  *STT_NOTYPE: Symbol kiểu không được định nghĩa
-  
-  *STT_FUNC: Symbol đại diện cho một hàm hoặc một đoạn mã thực thi khác
-  
-  *STT_OBJECT:Symbol đại dienj cho một đối tượng dữ liệu ví dụ như biến toàn cục
-  
-  *STT_SECTION: Symbol đại diện cho một section trong tệp ELF.các symbol này thượng được sử dụng trong các tệp đối tượng phục vụ quá trình liên kết
+       * STT_NOTYPE: Symbol kiểu không được định nghĩa
+       * STT_FUNC: Symbol đại diện cho một hàm hoặc một đoạn mã thực thi khác
+       * STT_OBJECT:Symbol đại dienj cho một đối tượng dữ liệu ví dụ như biến toàn cục
+       * STT_SECTION: Symbol đại diện cho một section trong tệp ELF.các symbol này thượng được sử dụng trong các tệp đối tượng phục vụ quá trình liên kết
 
--Các macro
+Các macro:
+ 
+    -ELFN_ST_BIND(st_info): Lấy giá trị st_bind từ st_info.  
+    -ELFN_ST_TYPE(st_info): Lấy giá trị st_type từ st_info.
+    -ELFN_ST_INFO(st_bind, st_type): Tạo giá trị st_info từ st_bind và st_type.
 
-  *ELFN_ST_BIND(st_info): Lấy giá trị st_bind từ st_info.
-  
-  *ELFN_ST_TYPE(st_info): Lấy giá trị st_type từ st_info.
-  
-  *ELFN_ST_INFO(st_bind, st_type): Tạo giá trị st_info từ st_bind và st_type.
-
--Các macro xử lý st_info
+Các macro xử lý st_info:
 ```c
 
 #define ELF32_ST_BIND(val)       (((unsigned char) (val)) >> 4)
@@ -693,7 +683,7 @@ st_info Values:
     ELF32_ST_INFO(bind, type): Kết hợp giá trị binding và type thành một byte st_info.
     Các macro ELF64 sử dụng cùng cách mã hóa này như các macro ELF32.
 
-Các giá trị của st_bind
+Các giá trị của st_bind:
 ```c
 #define STB_LOCAL	0		/* Local symbol */
 #define STB_GLOBAL	1		/* Global symbol */
