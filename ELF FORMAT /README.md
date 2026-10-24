@@ -478,9 +478,12 @@ sections:
 	.rel.plt: Chứa các mục tái định vị liên quan đến các hàm được gọi thông qua PLT, phục vụ cho việc giải quyết địa chỉ hàm trong quá trình liên kết động.
 
 Trong các phiên bản gcc cũ hơn :
+
 - .ctors: Tương đương với .init_array
+
 - .dtors: Tương đương với .fini_
-##Program Headers (Phdr)
+
+## Program Headers (Phdr)
 Bảng Program header cung cấp một góc nhìn theo các segment(phân đoạn) của file binary,trái ngước với góc nhìn theo các section được cung cấp bởi bảng section header
 Góc nhìn theo section của một tệp ELF chủ yếu phục vụ mục đích liên kết tĩnh, các công cụ phân tích nhị phân như readelf,objdump,IDA Pro... .
 Ngược lại, theo segment được hệ điều hành và dynamic linker sử dụng khi nạp một tệp ELF vào tiến trình để thực thi.Góc nhìn này  cho biết các phần của tệp được tổ chức và ánh xạ vào bộ nhớ như thế nào để thực thi.
@@ -515,22 +518,40 @@ typedef struct
 ```
 Giá trị:
 - p_type: các loại segment
-   *PT_NULL: Mục Program Header không được sử dụng. Nó thường xuất hiện ở đầu bảng Program Header, nhưng tiêu chuẩn ELF không bắt buộc nó phải là mục đầu tiên.
-   *PT_LOAD: Segment có thể được nạp vào bộ nhớ. Hệ điều hành sử dụng thông tin này để xác định phần dữ liệu cần ánh xạ vào bộ nhớ ảo khi thực thi chương trình.
-   *PT_DYNAMIC: Chứa thông tin phục vụ liên kết động (dynamic linking), liên quan đến section .dynamic.
-   *PT_INTERP: Xác định trình thông dịch chương trình (program interpreter) cần sử dụng. Đối với chương trình ELF liên kết động trên Linux, nó thường chỉ đến trình nạp động như ld-linux. Thông tin đường dẫn này được lưu trong section .interp.
-   *PT_GNU_EH_FRAME: Mô tả vị trí và kích thước của bảng dữ liệu .eh_frame_hdr, thường được sử dụng để hỗ trợ tìm kiếm thông tin xử lý ngoại lệ và stack unwinding trong các chương trình được biên dịch bằng GCC hoặc các công cụ tương thích. Nó không trực tiếp chứa các hàm xử lý ngoại lệ.
-   *PT_GNU_STACK: Dùng để biểu thị các thuộc tính liên quan đến stack của tiến trình, đặc biệt là việc stack có cần quyền thực thi hay không. Hệ điều hành có thể sử dụng thông tin này để thiết lập quyền bộ nhớ cho stack.
+
+  *PT_NULL: Mục Program Header không được sử dụng. Nó thường xuất hiện ở đầu bảng Program Header, nhưng tiêu chuẩn ELF không bắt buộc nó phải là mục đầu tiên.
+
+  *PT_LOAD: Segment có thể được nạp vào bộ nhớ. Hệ điều hành sử dụng thông tin này để xác định phần dữ liệu cần ánh xạ vào bộ nhớ ảo khi thực thi chương trình.
+
+  *PT_DYNAMIC: Chứa thông tin phục vụ liên kết động (dynamic linking), liên quan đến section .dynamic.
+
+  *PT_INTERP: Xác định trình thông dịch chương trình (program interpreter) cần sử dụng. Đối với chương trình ELF liên kết động trên Linux, nó thường chỉ đến trình nạp động như ld-linux. Thông tin đường dẫn này được lưu trong section .interp.
+
+  *PT_GNU_EH_FRAME: Mô tả vị trí và kích thước của bảng dữ liệu .eh_frame_hdr, thường được sử dụng để hỗ trợ tìm kiếm thông tin xử lý ngoại lệ và stack unwinding trong các chương trình được biên dịch bằng GCC hoặc các công cụ tương thích. Nó không trực tiếp chứa các hàm xử lý ngoại lệ.
+
+  *PT_GNU_STACK: Dùng để biểu thị các thuộc tính liên quan đến stack của tiến trình, đặc biệt là việc stack có cần quyền thực thi hay không. Hệ điều hành có thể sử dụng thông tin này để thiết lập quyền bộ nhớ cho stack.
+
 -p_flags:
+
    *PF_X(execute): Segment có quyền thực thi
+   
    *PF_W(write): Segment có quyền viết
+   
    *PF_R(read): Segment có quyền đọc
+
 -p_offset : độ lệch tính bằng byte từ đầu tệp ELF đếm vị trí dữ liệu tương ứng segment
+
 -p_vaddr : địa chỉ ảo mà segment sẽ được ánh xạ vào trong tệp ELF
--p_paddr : địa chỉ vật lý của segment (trong một số hệ thống chuyên dụng,trường này có thể được dùng để chỉ định địa chỉ vật lý mà segment cần được nạp đến,tuy nhiên trên các hệ điều hanh hiện đại sẽ thường dùng địa chỉ ảo)
+
+-p_paddr : địa chỉ vật lý của segment (trong một số hệ thống chuyên dụng,trường này có thể được dùng để chỉ định địa chỉ vật lý mà segment cần được nạp đến,tuy nhiên trên các hệ điều hanh 
+hiện đại sẽ thường dùng địa chỉ ảo)
+
 -p_filesz: Kích thước segment trong tệp được lưu trong tệp ELF,tính bằng byte
+
 -p_memsz: Kích thước bộ nhớ cần cho segment để lưu vào bộ nhớ
+
 -p_align: xác định yêu cầu căn chỉnh của segment, tương tự trường sh_addralign trong Section Header.
+
 p_type defines:
 ```c
 #define	PT_NULL		0		/* Program header table entry unused */
@@ -565,7 +586,8 @@ p_flags defines:
 ## Segment
 Có 2 loại segment :
   -Text Segment:
-     *.text
+
+	 *.text
      *.rodata
      *.hash
      *.dynsym
@@ -573,7 +595,8 @@ Có 2 loại segment :
      *.plt
      *.rel.got
  -Data Segment:
-     *.data
+     
+	 *.data
      *.dynamic
      *.got.plt
      *.bss
@@ -604,34 +627,52 @@ typedef struct
 } Elf64_Sym;
 ```
 Giá trị:
+
 -st_name — Tên symbol: Chỉ số dùng để xác định tên symbol trong bảng chuỗi, thường là .strtab hoặc .dynstr. Ví dụ: main, printf, global_var.
+
 -st_info — Loại và phạm vi liên kết của symbol: Chứa thông tin về kiểu symbol (symbol type) và phạm vi liên kết (symbol binding). Giá trị này được giải mã bằng các macro được định nghĩa trong ELF.
+
 -st_other — Khả năng hiển thị của symbol (symbol visibility): Xác định cách symbol có thể được truy cập hoặc nhìn thấy từ những đối tượng khác.
 
    * STV_DEFAULT: Khả năng hiển thị mặc định. Symbol có thể được truy cập từ các đối tượng khác nếu phạm vi liên kết và những điều kiện liên quan cho phép. Symbol toàn cục có thể bị thay thế (preempted) trong một số tình huống liên kết động.
+   
    * STV_PROTECTED: Symbol có thể được nhìn thấy từ các đối tượng khác, nhưng các tham chiếu bên trong đối tượng định nghĩa symbol đó sẽ gắn với chính định nghĩa này, không bị thay thế bởi định nghĩa khác.
+   
    * STV_HIDDEN: Symbol không được hiển thị để các đối tượng ELF khác truy cập trực tiếp thông qua cơ chế liên kết thông thường.
+   
    * STV_INTERNAL: Mức hiển thị được dành riêng cho các mục đích đặc biệt theo quy định của nền tảng hoặc hệ thống.
 
 -st_shndx — Chỉ số section: Xác định section liên quan đến symbol. Ví dụ, symbol của một hàm có thể thuộc section .text. Một số giá trị đặc biệt biểu thị symbol chưa được định nghĩa hoặc không gắn với section thông thường.
+
 -st_value — Giá trị symbol: Giá trị của symbol. Tùy loại tệp ELF và loại symbol, trường này có thể biểu thị địa chỉ, độ lệch hoặc một giá trị khác theo quy định của ELF.
+
 -st_size — Kích thước symbol: Kích thước của đối tượng mà symbol đại diện, tính bằng byte, nếu kích thước được xác định. Ví dụ, nó có thể biểu thị kích thước của một hàm hoặc biến.
 
 st_info Values:
+
 -st_bind: Xác định phạm vi liên kết của symbol
+
   * STB_LOCAL : symbol cục bộ không được hienre thị đê các tệp đói tượng khác tham chiếu thông qua cơ ché liên kết thông thường
+  
   * STB_GLOBAL : Symbol toàn cục có thể được các tệp đối tượng khác tham chiếu khi chúng được liên kết với nhau, miễn là điều kiện liên kết phù hợp
+  
   * STB_WEAK : Symbol yếu có cách xử lý tương tự symbol toàn cục,nhưng có độ ưu tiên thấp hơn trong một số quy tắc phân giải symbol
 -st_type: kiểu symbol
+  
   *STT_NOTYPE: Symbol kiểu không được định nghĩa
+  
   *STT_FUNC: Symbol đại diện cho một hàm hoặc một đoạn mã thực thi khác
+  
   *STT_OBJECT:Symbol đại dienj cho một đối tượng dữ liệu ví dụ như biến toàn cục
+  
   *STT_SECTION: Symbol đại diện cho một section trong tệp ELF.các symbol này thượng được sử dụng trong các tệp đối tượng phục vụ quá trình liên kết
 
 -Các macro
 
   *ELFN_ST_BIND(st_info): Lấy giá trị st_bind từ st_info.
+  
   *ELFN_ST_TYPE(st_info): Lấy giá trị st_type từ st_info.
+  
   *ELFN_ST_INFO(st_bind, st_type): Tạo giá trị st_info từ st_bind và st_type.
 
 -Các macro xử lý st_info
