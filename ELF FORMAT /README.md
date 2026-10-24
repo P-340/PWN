@@ -9,9 +9,10 @@
 <img width="690" height="205" alt="image" src="https://github.com/user-attachments/assets/a6fa69c5-ed8d-4ec3-96bc-3ae72ad583aa" />
 
 ## Executable Headers(Ehdr)
--đây là phần đầu của têp
--nó sẽ định nghĩa một thông tin cơ bản của file, giống như một file magic number dùng để nhận biết một file ELF hay là một kiểu file khác .
-Ngoài ra nó còn xác định loại của ELF, kiến trúc và một số option mà liên kết nó với các phần khác của ELF file.
+- Nằm ở ngay đầu tệp, đóng vai trò như "chứng minh thư" chứa các thông tin nhận diện cơ bản của file.
+- Chứa chuỗi **Magic Number** (`\x7fELF`) giúp hệ điều hành phân biệt tệp ELF với các định dạng file khác.
+- Xác định loại tệp ELF, kiến trúc CPU mục tiêu và giữ các con trỏ (offset) liên kết tới những thành phần còn lại bên trong file (như Program Header và Section Header).
+
 32-bit struct:
 ```c
 #define EI_NIDENT (16)
@@ -54,8 +55,9 @@ typedef struct
   Elf64_Half	e_shstrndx;		/* Section header string table index */
 } Elf64_Ehdr;
 ```
-EI_NIDENT  là kích thước trong byte của mục nhập cấu trúc đầu tiên ,e_type
-Đây là ELF magic headers va một số thông số kỹ thuật cơ bản của file
+-EI_NIDENT là kích thước trong byte của mục nhập cấu trúc đầu tiên 
+-e_type là ELF magic headers va một số thông số kỹ thuật cơ bản của file
+
 Values:
 
     - e_ident: đây là mảng 16 byte xác định đối tượng ELF,nó luôn bắt đầu với "\x7fELF".
@@ -306,9 +308,10 @@ Values:
 #define EV_NUM		  2
 ```
 ## Section Header (Shdr)
--Các đoạn code và dữ liệu được chia thành các chunk liên tiếp nhau được gọi là các section
--Nó là chỉ là một vùng không gian chứa dữ liệu hoặc code,những thông số kỹ thuật trong một section header đang chỉ định các chi tiết cần thiết như là size và offset
--Mọi section đều có một section header mà định nghĩa bản thân nó
+- Mã lệnh (code) và dữ liệu trong tệp ELF được chia thành các khối (chunk) riêng biệt gọi là **Section** (phân vùng).
+- Bản thân mỗi **Section** chỉ là vùng không gian thuần túy lưu trữ code hoặc dữ liệu, còn các thông số quản lý quan trọng (như kích thước `size`, vị trí `offset`, quyền hạn...) sẽ được quy định trong **Section Header**.
+- Mỗi **Section** luôn đi kèm với một **Section Header** tương ứng dùng để định nghĩa và mô tả chính nó.
+
 32-bit struct:
 ```c 
 typedef struct
@@ -373,11 +376,10 @@ Các giá trị:
     - sh_addralign: căn chỉnh địa chỉ bộ nhớ(luôn là luỹ thừa của 2) để CPU truy xuất dữ liệu tối ưu
     - sh_entsize : một số section bản chất là một cái mảng các struct có kích thước mỗi phần tử cố định (như bảng .dynsym chứa danh sách các Elf64_Sym, hoặc .rela.plt chứa
     - danh sách các Elf64_Rela).Trường sh_entsize lưu kích thước (tính bằng byte) của 1 dòng trong bảng đó .Nếu section không phải là bảng (như .text),trường này bằng 0.(Lợi dụng cách tính chỉ số phần tự dựa trên sh_entsize trong .dynsym và .rela.plt chính là cốt lõi của kỹ thuật Ret2diresolve)
-
--Tất cả section header định nghĩa section ,đều được lưu trữ trong section header table
--Để cài và thực thi một nhị phân trong một quá trình bạn cần tổ chức khác nhau của mã và dữ liệu trong nhị phân.vì lý do này, các tệp thực thi ELF chỉ định một logic khác ,  đó là segments,được sử dụng tại thời điểm thực thi chương trình, trong khi các section được sử dụng tại link time
--Các section là thành phần tuỳ chọn; chúng chủ yếu chứa metadata cho công cụ debuggers.Program header mới là thành phần quyết định cách một ELF binary được nạp vào bộ nhớ
--Do đó section header hkoong được nạp vào bộ nhớ
+- Toàn bộ các **Section Header** đều được tập hợp và lưu trữ chung trong bảng **Section Header Table**.
+- Để nạp (load) và chạy một tệp nhị phân trong tiến trình (process), hệ điều hành cần cách tổ chức mã lệnh và dữ liệu khác với lúc liên kết. Vì vậy, tệp ELF sử dụng hai góc nhìn logic: **Sections** dùng ở giai đoạn liên kết (*link-time*), còn **Segments** dùng ở giai đoạn thực thi (*runtime*).
+- Khi chạy chương trình, các **Section** chỉ là thành phần tùy chọn (chủ yếu cung cấp metadata cho trình gỡ lỗi như GDB, IDA). **Program Header** mới là thành phần thực sự quyết định cách nạp tệp ELF vào bộ nhớ.
+- Do đó, bảng **Section Header** hoàn toàn không cần nạp vào bộ nhớ RAM khi chương trình chạy.
 
 sh_type defines: 
 ```c
@@ -440,7 +442,7 @@ sh_flags defines:
 					   referenced or allocated (Solaris).*/
 ```
 ## Section
-Theo tiêu chuẩn ELF, mục đầu tiên trong bảng tiêu đề section (section header table) của mọi tệp ELF được quy định là một mục NULL.
+Theo tiêu chuẩn ELF, mục đầu tiên trong section header table của mọi tệp ELF được quy định là một mục NULL.
 Kiểu (type) của mục này là SHT_NULL, và tất cả các trường (field) trong section header đều được đặt về giá trị 0.
 sections:
     
@@ -488,15 +490,15 @@ sections:
 
 Trong các phiên bản gcc cũ hơn :
 
-- .ctors: Tương đương với .init_array
+    - .ctors: Tương đương với .init_array
 
-- .dtors: Tương đương với .fini_
+    - .dtors: Tương đương với .fini_
 
 ## Program Headers (Phdr)
-Bảng Program header cung cấp một góc nhìn theo các segment(phân đoạn) của file binary,trái ngước với góc nhìn theo các section được cung cấp bởi bảng section header
-Góc nhìn theo section của một tệp ELF chủ yếu phục vụ mục đích liên kết tĩnh, các công cụ phân tích nhị phân như readelf,objdump,IDA Pro... .
-Ngược lại, theo segment được hệ điều hành và dynamic linker sử dụng khi nạp một tệp ELF vào tiến trình để thực thi.Góc nhìn này  cho biết các phần của tệp được tổ chức và ánh xạ vào bộ nhớ như thế nào để thực thi.
-<img width="764" height="438" alt="image" src="https://github.com/user-attachments/assets/1ae72113-c484-4226-aa35-5bb892d80a54" />
+- **Hai góc nhìn của tệp ELF:** Bảng **Program Header** biểu diễn tệp dưới dạng các **Segments** (*Execution View*), trái ngược với bảng **Section Header** biểu diễn tệp dưới dạng các **Sections** (*Linking View*).
+- **Linking View (Section):** Phục vụ trình liên kết tĩnh (*linker*) và cung cấp thông tin cho các công cụ dịch ngược/phân tích tĩnh (`readelf`, `objdump`, `IDA Pro`...).
+- **Execution View (Segment):** Chỉ dẫn cho hệ điều hành và trình liên kết động (*dynamic linker*) cách gom nhóm và ánh xạ dữ liệu từ tệp ELF vào không gian bộ nhớ ảo để thực thi tiến trình.
+
 32-bit struct:
 ```c
   typedef struct
@@ -610,8 +612,10 @@ Có 2 loại segment :
      *.dynamic
      *.got.plt
      *.bss
+
+<img width="764" height="438" alt="image" src="https://github.com/user-attachments/assets/1ae72113-c484-4226-aa35-5bb892d80a54" />
 ## Symbols
-Symbol (ký hiệu) là một tham chiếu mang tính biểu tượng đến một loại dữ liệu hoặc mã lệnh nào đó, chẳng hạn như một biến toàn cục hoặc một hàm.
+**Symbol (Ký hiệu)** là tên định danh (nhãn) đại diện cho một vùng mã lệnh hoặc dữ liệu trong chương trình — chẳng hạn như tên của một **hàm** (`main`, `printf`) hoặc một **biến toàn cục**. Nó giúp ánh xạ một cái tên dễ đọc tới một địa chỉ bộ nhớ cụ thể.
 32-bit struct:
 ```c
 typedef struct
