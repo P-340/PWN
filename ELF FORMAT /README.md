@@ -526,40 +526,41 @@ typedef struct
 } Elf64_Phdr;
 ```
 Giá trị:
-- p_type: các loại segment
 
-  *PT_NULL: Mục Program Header không được sử dụng. Nó thường xuất hiện ở đầu bảng Program Header, nhưng tiêu chuẩn ELF không bắt buộc nó phải là mục đầu tiên.
+    - p_type: các loại segment
 
-  *PT_LOAD: Segment có thể được nạp vào bộ nhớ. Hệ điều hành sử dụng thông tin này để xác định phần dữ liệu cần ánh xạ vào bộ nhớ ảo khi thực thi chương trình.
+       *PT_NULL: Mục Program Header không được sử dụng. Nó thường xuất hiện ở đầu bảng Program Header, nhưng tiêu chuẩn ELF không bắt buộc nó phải là mục đầu tiên.
 
-  *PT_DYNAMIC: Chứa thông tin phục vụ liên kết động (dynamic linking), liên quan đến section .dynamic.
+       *PT_LOAD: Segment có thể được nạp vào bộ nhớ. Hệ điều hành sử dụng thông tin này để xác định phần dữ liệu cần ánh xạ vào bộ nhớ ảo khi thực thi chương trình.
 
-  *PT_INTERP: Xác định trình thông dịch chương trình (program interpreter) cần sử dụng. Đối với chương trình ELF liên kết động trên Linux, nó thường chỉ đến trình nạp động như ld-linux. Thông tin đường dẫn này được lưu trong section .interp.
+       *PT_DYNAMIC: Chứa thông tin phục vụ liên kết động (dynamic linking), liên quan đến section .dynamic.
 
-  *PT_GNU_EH_FRAME: Mô tả vị trí và kích thước của bảng dữ liệu .eh_frame_hdr, thường được sử dụng để hỗ trợ tìm kiếm thông tin xử lý ngoại lệ và stack unwinding trong các chương trình được biên dịch bằng GCC hoặc các công cụ tương thích. Nó không trực tiếp chứa các hàm xử lý ngoại lệ.
+       *PT_INTERP: Xác định trình thông dịch chương trình (program interpreter) cần sử dụng. Đối với chương trình ELF liên kết động trên Linux, nó thường chỉ đến trình nạp động như ld-linux. Thông tin đường dẫn này được lưu trong section .interp.
 
-  *PT_GNU_STACK: Dùng để biểu thị các thuộc tính liên quan đến stack của tiến trình, đặc biệt là việc stack có cần quyền thực thi hay không. Hệ điều hành có thể sử dụng thông tin này để thiết lập quyền bộ nhớ cho stack.
+       *PT_GNU_EH_FRAME: Mô tả vị trí và kích thước của bảng dữ liệu .eh_frame_hdr, thường được sử dụng để hỗ trợ tìm kiếm thông tin xử lý ngoại lệ và stack unwinding trong các chương trình được biên dịch bằng GCC hoặc các công cụ tương thích. Nó không trực tiếp chứa các hàm xử lý ngoại lệ.
 
--p_flags:
+       *PT_GNU_STACK: Dùng để biểu thị các thuộc tính liên quan đến stack của tiến trình, đặc biệt là việc stack có cần quyền thực thi hay không. Hệ điều hành có thể sử dụng thông tin này để thiết lập quyền bộ nhớ cho stack.
 
-   *PF_X(execute): Segment có quyền thực thi
+    -p_flags:
+
+       *PF_X(execute): Segment có quyền thực thi
    
-   *PF_W(write): Segment có quyền viết
+       *PF_W(write): Segment có quyền viết
    
-   *PF_R(read): Segment có quyền đọc
+        *PF_R(read): Segment có quyền đọc
 
--p_offset : độ lệch tính bằng byte từ đầu tệp ELF đếm vị trí dữ liệu tương ứng segment
+    -p_offset : độ lệch tính bằng byte từ đầu tệp ELF đếm vị trí dữ liệu tương ứng segment
 
--p_vaddr : địa chỉ ảo mà segment sẽ được ánh xạ vào trong tệp ELF
+    -p_vaddr : địa chỉ ảo mà segment sẽ được ánh xạ vào trong tệp ELF
 
--p_paddr : địa chỉ vật lý của segment (trong một số hệ thống chuyên dụng,trường này có thể được dùng để chỉ định địa chỉ vật lý mà segment cần được nạp đến,tuy nhiên trên các hệ điều hanh 
-hiện đại sẽ thường dùng địa chỉ ảo)
+    -p_paddr : địa chỉ vật lý của segment (trong một số hệ thống chuyên dụng,trường này có thể được dùng để chỉ định địa chỉ vật lý mà segment cần được nạp đến,tuy nhiên trên các hệ điều hanh 
+    hiện đại sẽ thường dùng địa chỉ ảo)
 
--p_filesz: Kích thước segment trong tệp được lưu trong tệp ELF,tính bằng byte
+    -p_filesz: Kích thước segment trong tệp được lưu trong tệp ELF,tính bằng byte
 
--p_memsz: Kích thước bộ nhớ cần cho segment để lưu vào bộ nhớ
+    -p_memsz: Kích thước bộ nhớ cần cho segment để lưu vào bộ nhớ
 
--p_align: xác định yêu cầu căn chỉnh của segment, tương tự trường sh_addralign trong Section Header.
+    -p_align: xác định yêu cầu căn chỉnh của segment, tương tự trường sh_addralign trong Section Header.
 
 p_type defines:
 ```c
