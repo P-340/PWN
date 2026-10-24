@@ -54,30 +54,32 @@ typedef struct
 EI_NIDENT  là kích thước trong byte của mục nhập cấu trúc đầu tiên ,e_type
 Đây là ELF magic headers va một số thông số kỹ thuật cơ bản của file
 Values:
-- e_ident: đây là mảng 16 byte xác định đối tượng ELF,nó luôn bắt đầu với "\x7fELF".
-- e_type : Chỉ định loại ELF:
-   *ET_NONE (Undefined): Một định dạng file ELF không rõ hoặc không được chỉ định
-   *ET_EXEC (executable file): Một ELF  thực thi độc lập - khi nạp vào bộ nhớ để chay qua execve,kernel sẽ ánh xạ binary này vào các địa chỉ ảo cố định xác định trước trong Program Header
-   *ET_DYN (shared object): một thư viện hoặc một thực thi liên kết động - khi được kernel nạp vào một base address ngẫu nhiên khi ASLR được bật
-   *ET_REL (Relocatable file) : một tệp đối tượng(object file - .o) hoặc các thư viện tĩnh (.a tập hợp các file .o) sinh ra sau đoạn complie/assemble nhưng chưa qua linker chứa mã máy,dữ liệu nhị phân nhưng chưa có địa chỉ bộ nhớ tuyệt đối hay cố định
-   *ET_CORE (Core dump file) : được kernel tự động ghi ra đĩa khi một tiến trình gặp lỗi như SIGEGV,SIGABRT,SIGBUS...
-- e_machine: mã số kiến trúc CPU(0x03-x86 32-bit, 0x3E- AMD64/x86-64, 0x28 EM_ARM ,....)
-- e_version: phiên bản của ELF file - luôn mang giá trị 1 (/EV_CURRENT) vì định dạng chuẩn chưa từng lên 2
-- e_entry: địa chỉ bộ nhớ ảo thường trỏ vào _start 
-- e_phoff(Program Header Table offset):Vị trí tính bằng byte từ đầu file đến Phdr - phần môt tả các segments
-- e_shoff(Section header table offset):Vị trí tính bằng byte từ đầu file đến Shdr - phần môt tả các sections
-- e_flags (Processor-specific flags): các cờ cấu hình đặc thù của từng CPU
-- e_ehsize(ELF Header size): kích thước chính của ELF header tính bằng bytes:
-  * ELF 32-bit: 52 bytes(0x34)
-  * ELF 64-bit: 64 bytes(0x40)
-- e_phentsize:kích thước mỗi bản ghi trong bằng Phdr
-- e_phnum: số lượng entry có trong bảng Phdr
-- e_shentsize : Kích thước nhập cảnh của Shdr
-- e_shnum : số lượng entry có trong bảng Shdr
-- e_shstrndx : chỉ index trỏ đến entry của Section .shstrtab trong bảng Shdr, section này chứa các chuỗi tên của tất cả các section(các chuỗi kết thúc bằng null byte như ".text\0",".data\0").Nhờ nó công cj đọc ELF mới giải mã được tên các section
+
+    - e_ident: đây là mảng 16 byte xác định đối tượng ELF,nó luôn bắt đầu với "\x7fELF".
+    - e_type : Chỉ định loại ELF:
+       *ET_NONE (Undefined): Một định dạng file ELF không rõ hoặc không được chỉ định
+       *ET_EXEC (executable file): Một ELF  thực thi độc lập - khi nạp vào bộ nhớ để chay qua execve,kernel sẽ ánh xạ binary này vào các địa chỉ ảo cố định xác định trước trong Program Header
+       *ET_DYN (shared object): một thư viện hoặc một thực thi liên kết động - khi được kernel nạp vào một base address ngẫu nhiên khi ASLR được bật
+       *ET_REL (Relocatable file) : một tệp đối tượng(object file - .o) hoặc các thư viện tĩnh (.a tập hợp các file .o) sinh ra sau đoạn complie/assemble nhưng chưa qua linker chứa mã máy,dữ liệu nhị phân nhưng chưa có địa chỉ bộ nhớ tuyệt đối hay cố định
+       *ET_CORE (Core dump file) : được kernel tự động ghi ra đĩa khi một tiến trình gặp lỗi như SIGEGV,SIGABRT,SIGBUS...
+    - e_machine: mã số kiến trúc CPU(0x03-x86 32-bit, 0x3E- AMD64/x86-64, 0x28 EM_ARM ,....)
+    - e_version: phiên bản của ELF file - luôn mang giá trị 1 (/EV_CURRENT) vì định dạng chuẩn chưa từng lên 2
+    - e_entry: địa chỉ bộ nhớ ảo thường trỏ vào _start 
+    - e_phoff(Program Header Table offset):Vị trí tính bằng byte từ đầu file đến Phdr - phần môt tả các segments
+    - e_shoff(Section header table offset):Vị trí tính bằng byte từ đầu file đến Shdr - phần môt tả các sections
+    - e_flags (Processor-specific flags): các cờ cấu hình đặc thù của từng CPU
+    - e_ehsize(ELF Header size): kích thước chính của ELF header tính bằng bytes:
+       * ELF 32-bit: 52 bytes(0x34)
+       * ELF 64-bit: 64 bytes(0x40)
+    - e_phentsize:kích thước mỗi bản ghi trong bằng Phdr
+    - e_phnum: số lượng entry có trong bảng Phdr
+    - e_shentsize : Kích thước nhập cảnh của Shdr
+    - e_shnum : số lượng entry có trong bảng Shdr
+    - e_shstrndx : chỉ index trỏ đến entry của Section .shstrtab trong bảng Shdr, section này chứa các chuỗi tên của tất cả các section(các chuỗi kết thúc bằng null byte như ".text\0",".data\0").Nhờ nó công cj đọc ELF mới giải mã được tên các section
+
 - Note: e_phoff và e_shoff là offsets của ELF file, e_entry thay vào đó là một địa chỉ ảo
 
-- định dạng e_type:
+- Định dạng e_type:
 ```c
 #define ET_NONE		0		/* No file type */
 #define ET_REL		1		/* Relocatable file */
@@ -90,7 +92,7 @@ Values:
 #define ET_LOPROC	0xff00		/* Processor-specific range start */
 #define ET_HIPROC	0xffff		/* Processor-specific range end */
 ```
-- định dạng e_machine:
+- Định dạng e_machine:
 ```c
 #define EM_NONE		 0	/* No machine */
 #define EM_M32		 1	/* AT&T WE 32100 */
@@ -294,16 +296,16 @@ Values:
 
 #define EM_ALPHA	0x9026
 ```
-e_version denfines:
+-định dạng e_version :
 ```c
 #define EV_NONE		  0		/* Invalid ELF version */
 #define EV_CURRENT	1		/* Current version */
 #define EV_NUM		  2
 ```
 ## Section Header (Shdr)
-Các đoạn code và dữ liệu được chia thành các chunk liên tiếp nhau được gọi là các section
-Nó là chỉ là một vùng không gian chứa dữ liệu hoặc code,những thông số kỹ thuật trong một section header đang chỉ định các chi tiết cần thiết như là size và offset
-Mọi section đều có một section header mà định nghĩa bản thân nó
+-Các đoạn code và dữ liệu được chia thành các chunk liên tiếp nhau được gọi là các section
+-Nó là chỉ là một vùng không gian chứa dữ liệu hoặc code,những thông số kỹ thuật trong một section header đang chỉ định các chi tiết cần thiết như là size và offset
+-Mọi section đều có một section header mà định nghĩa bản thân nó
 32-bit struct:
 ```c 
 typedef struct
@@ -337,39 +339,43 @@ typedef struct
 } Elf64_Shdr;
 ```
 Các giá trị:
-- sh_name : Index chỉ vào bảng chuỗi,nếu bằng không thì nghĩa là không có tên (.shstrtab)
-- sh_type:kiểu của section
-  * SHT_NULL : mục rỗng không được sử dụng (nằm ở Index 0 của section header
-  * SHT_PROGBITS: dữ liệu của chương trình do trình biên dịch tạo ra :
-     * .text : chứa mã máy của chương trình
-     * .data : Biến toàn cục đã được khởi tạo giá trị
-     * .rodata : Các hằng số only read (ví dụ chuỗi string "hello","/bin/sh")
-  * Bảng Symbol: dùng lể lưu danh sách các tên hàm như main, win, puts,system 
-     * SHT_SYMTAB(.symtab): Bảng symbol dung cho việc debug(sẽ mất nếu người tạo bài dùng lệnh strip để xoá dấu vết)
-     * SHT_DYNSYM(.dynsym): Bảng symbol dùng cho liên kết động lúc chương trình chạy
-  * SHT_STRTAB:  String table- chữa các chuỗi ký tự kết thúc bằng byte \x00 (như .strtab,.dynstr,.shstrtab) để đặt tên cho các hàm, biến và section
-  * SHT_RELA và SHT_REL: chứa các entry phục vụ việc cập nhật địa chỉ hàm/biến lúc chạy(chẳng hạn cơ chế phân giải địa chỉ hàm thư viện trong bảng GOT/PLT).SHT_RETA có thêm trường hằng số bù (addend),còn SHT_REL thì không .
-  * SHT_HASH : Bảng băm giúp trình liên kết động tìm kiếm nhanh các symbol mà không cần duyệt tuần tự.
-  * SHT_NOTE: Chứa ghi chú
-  * SHT_NOBITS: Phân vùng dữ liệu chưa được khởi tạo (.bss,...), không tốn dung lượng lưu trữ trong file trên ổ,nhưng vẫn được cấp phát một vùng nhớ trống
-  * SHT_SHLIB: Dự trữ
-- sh_flags: Mô tả thông tin bổ sung về một phần
-  * SHF_WRITE: Writable trong thời gian chạy(.data,.bss,.got),khi pwn sẽ thường nhắm vào bss
-  * SHF_ALLOC: báo cho hệ thống biết section chứa cờ này cần nạp vào RAM khi program run
-  * SHF_EXECINSTR: Chứa mã lệnh được phép Thực thi(ví dụ : .text,.plt).khi bật NX,CPU chỉ chấp nhận chạy code nằm trong vùng nhớ có cờ này, ROPgadget hay quét gadget ở đây
-- sh_addr: Phần địạ chỉ thực tế trên RAM của section khi chương trình chạy (nếu cờ PIE bật, cái này sẽ là offset so với base, nếu PIE tắt đây sẽ là địa chỉ cố định )
-- sh_offset: Vị trí bắt đầu của section tính bằng số byte kể từ đầu ELF
-- sh_size: Độ dài(tổng số byte) của section đó
-- sh_link: Tạo mối liên kết đến một section khác(VD: SHT_SYMTAB, SHT_DYNSYM, hoặc SHT_DYNAMIC có bảng string liên kết có chứa các tên symbol trong question.Relocation sections (type SHT_REL or SHT_RELA) được liên kết với bảng symbol mô tả các symbol liên quan đến quá trình tái định vị.
-- sh_info: Thông tin phần bổ sung, nếu sh_link liên kết với section là relocation thì sh_info trỏ tới section như .got sẽ bị sửa địa chỉ
-- sh_addralign: căn chỉnh địa chỉ bộ nhớ(luôn là luỹ thừa của 2) để CPU truy xuất dữ liệu tối ưu
-- sh_entsize : một số section bản chất là một cái mảng các struct có kích thước mỗi phần tử cố định (như bảng .dynsym chứa danh sách các Elf64_Sym, hoặc .rela.plt chứa
-- danh sách các Elf64_Rela).Trường sh_entsize lưu kích thước (tính bằng byte) của 1 dòng trong bảng đó .Nếu section không phải là bảng (như .text),trường này bằng 0.(Lợi dụng cách tính chỉ số phần tự dựa trên sh_entsize trong .dynsym và .rela.plt chính là cốt lõi của kỹ thuật Ret2diresolve)
 
-Tất cả section header định nghĩa section ,đều được lưu trữ trong section header table
-Để cài và thực thi một nhị phân trong một quá trình bạn cần tổ chức khác nhau của mã và dữ liệu trong nhị phân.vì lý do này, các tệp thực thi ELF chỉ định một logic khác ,  đó là segments,được sử dụng tại thời điểm thực thi chương trình, trong khi các section được sử dụng tại link time
-Các section là thành phần tuỳ chọn; chúng chủ yếu chứa metadata cho công cụ debuggers.Program header mới là thành phần quyết định cách một ELF binary được nạp vào bộ nhớ
-Do đó section header hkoong được nạp vào bộ nhớ
+    - sh_name : Index chỉ vào bảng chuỗi,nếu bằng không thì nghĩa là không có tên (.shstrtab)
+    - sh_type(kiểu của section):
+   
+      * SHT_NULL : mục rỗng không được sử dụng (nằm ở Index 0 của section header
+      * SHT_PROGBITS: dữ liệu của chương trình do trình biên dịch tạo ra :
+          * .text : chứa mã máy của chương trình
+          * .data : Biến toàn cục đã được khởi tạo giá trị
+          * .rodata : Các hằng số only read (ví dụ chuỗi string "hello","/bin/sh")
+      * Bảng Symbol: dùng lể lưu danh sách các tên hàm như main, win, puts,system 
+         * SHT_SYMTAB(.symtab): Bảng symbol dung cho việc debug(sẽ mất nếu người tạo bài dùng lệnh strip để xoá dấu vết)
+         * SHT_DYNSYM(.dynsym): Bảng symbol dùng cho liên kết động lúc chương trình chạy
+      * SHT_STRTAB:  String table- chữa các chuỗi ký tự kết thúc bằng byte \x00 (như .strtab,.dynstr,.shstrtab) để đặt tên cho các hàm, biến và section
+      * SHT_RELA và SHT_REL: chứa các entry phục vụ việc cập nhật địa chỉ hàm/biến lúc chạy(chẳng hạn cơ chế phân giải địa chỉ hàm thư viện trong bảng GOT/PLT).SHT_RETA có thêm trường hằng số bù (addend),còn SHT_REL thì không .
+      * SHT_HASH : Bảng băm giúp trình liên kết động tìm kiếm nhanh các symbol mà không cần duyệt tuần tự.
+      * SHT_NOTE: Chứa ghi chú
+      * SHT_NOBITS: Phân vùng dữ liệu chưa được khởi tạo (.bss,...), không tốn dung lượng lưu trữ trong file trên ổ,nhưng vẫn được cấp phát một vùng nhớ trống
+      * SHT_SHLIB: Dự trữ
+    - sh_flags: Mô tả thông tin bổ sung về một phần
+
+      * SHF_WRITE: Writable trong thời gian chạy(.data,.bss,.got),khi pwn sẽ thường nhắm vào bss
+      * SHF_ALLOC: báo cho hệ thống biết section chứa cờ này cần nạp vào RAM khi program run
+      * SHF_EXECINSTR: Chứa mã lệnh được phép Thực thi(ví dụ : .text,.plt).khi bật NX,CPU chỉ chấp nhận chạy code nằm trong vùng nhớ có cờ này, ROPgadget hay quét gadget ở đây
+    - sh_addr: Phần địạ chỉ thực tế trên RAM của section khi chương trình chạy (nếu cờ PIE bật, cái này sẽ là offset so với base, nếu PIE tắt đây sẽ là địa chỉ cố định )
+    - sh_offset: Vị trí bắt đầu của section tính bằng số byte kể từ đầu ELF
+    - sh_size: Độ dài(tổng số byte) của section đó
+    - sh_link: Tạo mối liên kết đến một section khác(VD: SHT_SYMTAB, SHT_DYNSYM, hoặc SHT_DYNAMIC có bảng string liên kết có chứa các tên symbol trong question.Relocation sections (type SHT_REL or SHT_RELA) được liên kết với bảng symbol mô tả các symbol liên quan đến quá trình tái định vị.
+    - sh_info: Thông tin phần bổ sung, nếu sh_link liên kết với section là relocation thì sh_info trỏ tới section như .got sẽ bị sửa địa chỉ
+    - sh_addralign: căn chỉnh địa chỉ bộ nhớ(luôn là luỹ thừa của 2) để CPU truy xuất dữ liệu tối ưu
+    - sh_entsize : một số section bản chất là một cái mảng các struct có kích thước mỗi phần tử cố định (như bảng .dynsym chứa danh sách các Elf64_Sym, hoặc .rela.plt chứa
+    - danh sách các Elf64_Rela).Trường sh_entsize lưu kích thước (tính bằng byte) của 1 dòng trong bảng đó .Nếu section không phải là bảng (như .text),trường này bằng 0.(Lợi dụng cách tính chỉ số phần tự dựa trên sh_entsize trong .dynsym và .rela.plt chính là cốt lõi của kỹ thuật Ret2diresolve)
+
+-Tất cả section header định nghĩa section ,đều được lưu trữ trong section header table
+-Để cài và thực thi một nhị phân trong một quá trình bạn cần tổ chức khác nhau của mã và dữ liệu trong nhị phân.vì lý do này, các tệp thực thi ELF chỉ định một logic khác ,  đó là segments,được sử dụng tại thời điểm thực thi chương trình, trong khi các section được sử dụng tại link time
+-Các section là thành phần tuỳ chọn; chúng chủ yếu chứa metadata cho công cụ debuggers.Program header mới là thành phần quyết định cách một ELF binary được nạp vào bộ nhớ
+-Do đó section header hkoong được nạp vào bộ nhớ
+
 sh_type defines: 
 ```c
 #define SHT_NULL	  0		/* Section header table entry unused */
