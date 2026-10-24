@@ -1,5 +1,6 @@
-#ELF Format Cheatsheet
-##Introduction 
+# ELF Format Cheatsheet
+
+## Introduction 
 
 <img width="680" height="1135" alt="image" src="https://github.com/user-attachments/assets/5856ea20-7286-4852-80ae-0a43385c2d69" />
 ##Compilation 
