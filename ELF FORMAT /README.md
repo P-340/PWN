@@ -435,26 +435,46 @@ Theo tiêu chuẩn ELF, mục đầu tiên trong bảng tiêu đề section (sec
 Kiểu (type) của mục này là SHT_NULL, và tất cả các trường (field) trong section header đều được đặt về giá trị 0.
 sections:
     .init: Chứa mã máy thực thi thực hiện các tác vụ khởi tạo và cần được chạy trước khi mã khác trong tệp nhị phân được thực thi. Section này có cờ SHF_EXECINSTR, cho biết nó chứa các lệnh có thể thực thi. Hệ thống thực thi mã trong section .init trước khi chuyển quyền điều khiển đến điểm bắt đầu thực thi chính của tệp nhị phân.
+	
     .fini: Ngược lại với .init, section này chứa mã thực thi cần chạy sau khi chương trình chính hoàn tất.
-    .text: Chứa phần mã máy chính của chương trình. Section này có cờ SHF_EXECINSTR, cho biết mã bên trong có thể thực thi. Nó có kiểu SHT_PROGBITS vì chứa dữ liệu mã do người dùng định nghĩa, chẳng hạn như mã được biên dịch từ chương trình C.
-    .bss: Chứa dữ liệu chưa được khởi tạo (uninitialized data). Section này có kiểu SHT_NOBITS. Nó không chiếm dung lượng tương ứng trong tệp trên đĩa, giúp tránh lãng phí không gian lưu trữ. Khi chương trình chạy, vùng nhớ dành cho dữ liệu này thường được khởi tạo bằng 0. Section này có quyền ghi.
-    .data: Chứa dữ liệu của chương trình đã được khởi tạo. Section này có quyền ghi và có kiểu SHT_PROGBITS.
-    .rodata: Chứa dữ liệu chỉ đọc (read-only data), chẳng hạn như các chuỗi được sử dụng trong mã chương trình. Nếu dữ liệu cần có khả năng thay đổi, nó thường được đặt trong .data thay vì .rodata. Ví dụ, các chuỗi được viết trực tiếp trong mã nguồn để truyền cho hàm printf() có thể được lưu tại đây.
-    .plt: Là viết tắt của Procedure Linkage Table (bảng liên kết thủ tục). Đây là vùng mã phục vụ cho việc liên kết động (dynamic linking), hỗ trợ chương trình gọi các hàm bên ngoài được cung cấp bởi thư viện dùng chung (shared library). Cơ chế này phối hợp với GOT (Global Offset Table).
-    .got.plt: Là một bảng dùng để lưu trữ hoặc hỗ trợ tra cứu địa chỉ của các hàm bên ngoài phục vụ cho cơ chế liên kết động. Bảng này thường có quyền ghi khi sử dụng cơ chế lazy binding mặc định. Tuy nhiên, quyền ghi có thể được loại bỏ sau khi các địa chỉ đã được giải quyết, chẳng hạn khi sử dụng cơ chế Relocation Read-Only (RELRO). Biến môi trường LD_BIND_NOW cũng có thể được thiết lập để yêu cầu giải quyết các hàm được nhập ngay khi chương trình khởi tạo.
-    .rel.*: Chứa thông tin về cách các phần của tệp đối tượng ELF hoặc ảnh chương trình trong bộ nhớ cần được điều chỉnh tại thời điểm liên kết hoặc khi chạy chương trình. Các section này có kiểu SHT_REL. Trong định dạng này, thông tin cộng thêm (addend) được lưu riêng tại vị trí cần thực hiện phép tái định vị.
-    .rela.*: Tương tự .rel.*, section này chứa thông tin về cách điều chỉnh các phần của tệp ELF tại thời điểm liên kết hoặc khi chạy chương trình. Điểm khác biệt là thông tin cộng thêm (addend) được lưu trực tiếp trong mục tái định vị. Các section này có kiểu SHT_RELA.
-    .dynamic: Chứa các cấu trúc và đối tượng phục vụ cho việc liên kết động. Section này chứa một bảng gồm các cấu trúc ElfN_Dyn. Nó cũng chứa thông tin tham chiếu đến những thành phần quan trọng mà trình liên kết động cần sử dụng, chẳng hạn như bảng chuỗi động, bảng ký hiệu động, section .got.plt và section tái định vị động. Các thành phần này có thể được tham chiếu thông qua những thẻ như DT_STRTAB, DT_SYMTAB, DT_PLTGOT và DT_RELA.
-    .init_array: Chứa một mảng các con trỏ hàm dùng làm hàm khởi tạo (constructors). Những hàm này được gọi lần lượt trong quá trình khởi tạo chương trình. Trong GCC, bạn có thể đánh dấu một hàm trong mã nguồn C là hàm khởi tạo bằng cách sử dụng thuộc tính __attribute__((constructor)). Theo mặc định, section này có thể chứa một mục dùng để thực thi hàm frame_dummy.
-    .fini_array: Chứa một mảng các con trỏ hàm dùng làm hàm hủy (destructors). Những hàm này được gọi trong quá trình kết thúc chương trình hoặc khi thư viện được gỡ bỏ, tùy thuộc vào ngữ cảnh.
-    .shstrtab: Là một mảng các chuỗi kết thúc bằng ký tự NULL (\0), chứa tên của tất cả các section trong tệp ELF.
-    .symtab: Chứa bảng ký hiệu (symbol table), gồm các cấu trúc ElfN_Sym. Mỗi cấu trúc liên kết một tên ký hiệu với một đối tượng mã hoặc dữ liệu trong tệp ELF, chẳng hạn như một hàm hoặc một biến.
-    .strtab: Chứa các chuỗi biểu diễn tên ký hiệu. Các cấu trúc trong .symtab tham chiếu đến những chuỗi này để xác định tên tương ứng.
-    .dynsym: Tương tự .symtab, nhưng chứa các ký hiệu cần thiết cho quá trình liên kết động thay vì chỉ phục vụ cho việc liên kết tĩnh.
-    .dynstr: Tương tự .strtab, nhưng chứa các chuỗi tên ký hiệu cần thiết cho quá trình liên kết động.
-    .interp: Chứa chuỗi chỉ định trình thông dịch chương trình (program interpreter) cần sử dụng để nạp và thực thi tệp ELF. Đối với các chương trình Linux liên kết động, chuỗi này thường chỉ đến trình nạp động, chẳng hạn như ld-linux.
-    .rel.dyn: Chứa các mục tái định vị động, thường liên quan đến việc điều chỉnh địa chỉ của các đối tượng dữ liệu và những tham chiếu khác cần được xử lý khi nạp chương trình hoặc thư viện.
-    .rel.plt: Chứa các mục tái định vị liên quan đến các hàm được gọi thông qua PLT, phục vụ cho việc giải quyết địa chỉ hàm trong quá trình liên kết động.
+    
+	.text: Chứa phần mã máy chính của chương trình. Section này có cờ SHF_EXECINSTR, cho biết mã bên trong có thể thực thi. Nó có kiểu SHT_PROGBITS vì chứa dữ liệu mã do người dùng định nghĩa, chẳng hạn như mã được biên dịch từ chương trình C.
+    
+	.bss: Chứa dữ liệu chưa được khởi tạo (uninitialized data). Section này có kiểu SHT_NOBITS. Nó không chiếm dung lượng tương ứng trong tệp trên đĩa, giúp tránh lãng phí không gian lưu trữ. Khi chương trình chạy, vùng nhớ dành cho dữ liệu này thường được khởi tạo bằng 0. Section này có quyền ghi.
+    
+	.data: Chứa dữ liệu của chương trình đã được khởi tạo. Section này có quyền ghi và có kiểu SHT_PROGBITS.
+    
+	.rodata: Chứa dữ liệu chỉ đọc (read-only data), chẳng hạn như các chuỗi được sử dụng trong mã chương trình. Nếu dữ liệu cần có khả năng thay đổi, nó thường được đặt trong .data thay vì .rodata. Ví dụ, các chuỗi được viết trực tiếp trong mã nguồn để truyền cho hàm printf() có thể được lưu tại đây.
+    
+	.plt: Là viết tắt của Procedure Linkage Table (bảng liên kết thủ tục). Đây là vùng mã phục vụ cho việc liên kết động (dynamic linking), hỗ trợ chương trình gọi các hàm bên ngoài được cung cấp bởi thư viện dùng chung (shared library). Cơ chế này phối hợp với GOT (Global Offset Table).
+    
+	.got.plt: Là một bảng dùng để lưu trữ hoặc hỗ trợ tra cứu địa chỉ của các hàm bên ngoài phục vụ cho cơ chế liên kết động. Bảng này thường có quyền ghi khi sử dụng cơ chế lazy binding mặc định. Tuy nhiên, quyền ghi có thể được loại bỏ sau khi các địa chỉ đã được giải quyết, chẳng hạn khi sử dụng cơ chế Relocation Read-Only (RELRO). Biến môi trường LD_BIND_NOW cũng có thể được thiết lập để yêu cầu giải quyết các hàm được nhập ngay khi chương trình khởi tạo.
+    
+	.rel.*: Chứa thông tin về cách các phần của tệp đối tượng ELF hoặc ảnh chương trình trong bộ nhớ cần được điều chỉnh tại thời điểm liên kết hoặc khi chạy chương trình. Các section này có kiểu SHT_REL. Trong định dạng này, thông tin cộng thêm (addend) được lưu riêng tại vị trí cần thực hiện phép tái định vị.
+    
+	.rela.*: Tương tự .rel.*, section này chứa thông tin về cách điều chỉnh các phần của tệp ELF tại thời điểm liên kết hoặc khi chạy chương trình. Điểm khác biệt là thông tin cộng thêm (addend) được lưu trực tiếp trong mục tái định vị. Các section này có kiểu SHT_RELA.
+    
+	.dynamic: Chứa các cấu trúc và đối tượng phục vụ cho việc liên kết động. Section này chứa một bảng gồm các cấu trúc ElfN_Dyn. Nó cũng chứa thông tin tham chiếu đến những thành phần quan trọng mà trình liên kết động cần sử dụng, chẳng hạn như bảng chuỗi động, bảng ký hiệu động, section .got.plt và section tái định vị động. Các thành phần này có thể được tham chiếu thông qua những thẻ như DT_STRTAB, DT_SYMTAB, DT_PLTGOT và DT_RELA.
+    
+	.init_array: Chứa một mảng các con trỏ hàm dùng làm hàm khởi tạo (constructors). Những hàm này được gọi lần lượt trong quá trình khởi tạo chương trình. Trong GCC, bạn có thể đánh dấu một hàm trong mã nguồn C là hàm khởi tạo bằng cách sử dụng thuộc tính __attribute__((constructor)). Theo mặc định, section này có thể chứa một mục dùng để thực thi hàm frame_dummy.
+    
+	.fini_array: Chứa một mảng các con trỏ hàm dùng làm hàm hủy (destructors). Những hàm này được gọi trong quá trình kết thúc chương trình hoặc khi thư viện được gỡ bỏ, tùy thuộc vào ngữ cảnh.
+    
+	.shstrtab: Là một mảng các chuỗi kết thúc bằng ký tự NULL (\0), chứa tên của tất cả các section trong tệp ELF.
+    
+	.symtab: Chứa bảng ký hiệu (symbol table), gồm các cấu trúc ElfN_Sym. Mỗi cấu trúc liên kết một tên ký hiệu với một đối tượng mã hoặc dữ liệu trong tệp ELF, chẳng hạn như một hàm hoặc một biến.
+    
+	.strtab: Chứa các chuỗi biểu diễn tên ký hiệu. Các cấu trúc trong .symtab tham chiếu đến những chuỗi này để xác định tên tương ứng.
+    
+	.dynsym: Tương tự .symtab, nhưng chứa các ký hiệu cần thiết cho quá trình liên kết động thay vì chỉ phục vụ cho việc liên kết tĩnh.
+    
+	.dynstr: Tương tự .strtab, nhưng chứa các chuỗi tên ký hiệu cần thiết cho quá trình liên kết động.
+    
+	.interp: Chứa chuỗi chỉ định trình thông dịch chương trình (program interpreter) cần sử dụng để nạp và thực thi tệp ELF. Đối với các chương trình Linux liên kết động, chuỗi này thường chỉ đến trình nạp động, chẳng hạn như ld-linux.
+    
+	.rel.dyn: Chứa các mục tái định vị động, thường liên quan đến việc điều chỉnh địa chỉ của các đối tượng dữ liệu và những tham chiếu khác cần được xử lý khi nạp chương trình hoặc thư viện.
+    
+	.rel.plt: Chứa các mục tái định vị liên quan đến các hàm được gọi thông qua PLT, phục vụ cho việc giải quyết địa chỉ hàm trong quá trình liên kết động.
 
 Trong các phiên bản gcc cũ hơn :
 - .ctors: Tương đương với .init_array
