@@ -3,8 +3,11 @@
 ## Introduction 
 
 <img width="680" height="1135" alt="image" src="https://github.com/user-attachments/assets/5856ea20-7286-4852-80ae-0a43385c2d69" />
+
 ## Compilation 
+
 <img width="690" height="205" alt="image" src="https://github.com/user-attachments/assets/a6fa69c5-ed8d-4ec3-96bc-3ae72ad583aa" />
+
 ## Executable Headers(Ehdr)
 -đây là phần đầu của têp
 -nó sẽ định nghĩa một thông tin cơ bản của file, giống như một file magic number dùng để nhận biết một file ELF hay là một kiểu file khác .
