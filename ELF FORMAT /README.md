@@ -434,7 +434,8 @@ sh_flags defines:
 Theo tiêu chuẩn ELF, mục đầu tiên trong bảng tiêu đề section (section header table) của mọi tệp ELF được quy định là một mục NULL.
 Kiểu (type) của mục này là SHT_NULL, và tất cả các trường (field) trong section header đều được đặt về giá trị 0.
 sections:
-    .init: Chứa mã máy thực thi thực hiện các tác vụ khởi tạo và cần được chạy trước khi mã khác trong tệp nhị phân được thực thi. Section này có cờ SHF_EXECINSTR, cho biết nó chứa các lệnh có thể thực thi. Hệ thống thực thi mã trong section .init trước khi chuyển quyền điều khiển đến điểm bắt đầu thực thi chính của tệp nhị phân.
+    
+	.init: Chứa mã máy thực thi thực hiện các tác vụ khởi tạo và cần được chạy trước khi mã khác trong tệp nhị phân được thực thi. Section này có cờ SHF_EXECINSTR, cho biết nó chứa các lệnh có thể thực thi. Hệ thống thực thi mã trong section .init trước khi chuyển quyền điều khiển đến điểm bắt đầu thực thi chính của tệp nhị phân.
 	
     .fini: Ngược lại với .init, section này chứa mã thực thi cần chạy sau khi chương trình chính hoàn tất.
     
