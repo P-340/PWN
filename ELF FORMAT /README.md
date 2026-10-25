@@ -725,3 +725,7 @@ st_type defines:
 #define STT_LOPROC	13		/* Start of processor-specific */
 #define STT_HIPROC	15		/* End of processor-specific */
 ```
+## Dynamic Linking 
+
+<img width="500" height="562" alt="image" src="https://github.com/user-attachments/assets/1e0b99f2-657a-4ae7-aa16-319d985dfd15" />
+
