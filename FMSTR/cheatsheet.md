@@ -18,7 +18,14 @@
 
 ## Mẫu vuln cơ bản
 ```c
-// Sai (Vulnerable): int func(char \*user) { printf(user); // Người dùng kiểm soát chuỗi định dạng } // Đúng (Secure): int func(char \*user) { printf("%s", user); // Chuỗi định dạng cố định là "%s" }
+// Sai (Vulnerable):
+int func(char \*user) {
+printf(user); // Người dùng kiểm soát chuỗi định dạng
+}
+ // Đúng (Secure):
+int func(char \*user) {
+printf("%s", user); // Chuỗi định dạng cố định là "%s"
+}
 ```
 ## Mã nguồn lỗi trong thực tế 
 
@@ -27,13 +34,20 @@ Các hàm thuộc gia đình định dạng bao gồm `printf`, `fprintf`, `spri
 * **Dạng 1 (Direct Vulnerability):** Chuỗi định dạng do người dùng cung cấp trực tiếp vào tham số hàm (như trong lỗi `rpc.statd` trên Linux hoặc `telnetd` trên IRIX).
 
 ```c
-char tmpbuf[512]; snprintf(tmpbuf, sizeof(tmpbuf), "foo: %s", user); syslog(LOG\_NOTICE, tmpbuf); // Lỗi tại tham số thứ hai của syslog
+char tmpbuf[512];
+snprintf(tmpbuf, sizeof(tmpbuf), "foo: %s", user);
+syslog(LOG\_NOTICE, tmpbuf); // Lỗi tại tham số thứ hai của syslog
 ```
 
 * **Dạng 2 (Indirect Vulnerability):** Chuỗi người dùng được truyền gián tiếp qua một hàm bọc (wrapper function) tùy chỉnh (như trong `wu-ftpd` hoặc `QPOP 2.53`).
 
 ```c
-int Error(char \*fmt, ...) { ... } int somefunc(char \*user) { Error(user); // Truyền gián tiếp người dùng nhập vào hàm bọc }
+int Error(char \*fmt, ...) {
+ ...
+}
+int somefunc(char \*user) {
+ Error(user); // Truyền gián tiếp người dùng nhập vào hàm bọc
+}
 ```
 ## Các thao tác khai thác cơ bản 
 ### 1\. Gây Crash Chương Trình (Denial of Service)
@@ -70,7 +84,11 @@ Sử dụng đặc tả `%n` để ghi số lượng ký tự đã in vào đị
 Công thức tính số lượng ký tự đệm (padding) cho mỗi bước ghi byte `write_byte` khi đã in `already_written` ký tự:
 
 ```c
-write\_byte += 0x100 already\_written %= 0x100 padding = (write\_byte - already\_written) % 0x100 if (padding &lt; 10) padding += 0x100
+write\_byte += 0x100
+already\_written %= 0x100
+padding = (write\_byte - already\_written) % 0x100
+if (padding &lt; 10)
+    padding += 0x100
 ```
 *Lưu ý:* Việc đảm bảo `padding &gt;= 10` giúp độ rộng chuỗi xuất ra bởi cờ dạng `%nu` luôn chính xác theo tham số chiều dài chỉ định.
 
