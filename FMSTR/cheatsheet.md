@@ -36,7 +36,7 @@ char tmpbuf[512]; snprintf(tmpbuf, sizeof(tmpbuf), "foo: %s", user); syslog(LOG\
 int Error(char \*fmt, ...) { ... } int somefunc(char \*user) { Error(user); // Truyền gián tiếp người dùng nhập vào hàm bọc }
 ```
 ## Các thao tác khai thác cơ bản 
-### 4.1\. Gây Crash Chương Trình (Denial of Service)
+### 1\. Gây Crash Chương Trình (Denial of Service)
 
 Gửi chuỗi định dạng chứa nhiều ký tự `%s` liên tiếp:
 
@@ -47,7 +47,7 @@ Gửi chuỗi định dạng chứa nhiều ký tự `%s` liên tiếp:
 
 Hàm định dạng sẽ cố gắng đọc chuỗi từ các địa chỉ ngẫu nhiên trên Stack. Khi gặp địa chỉ không hợp lệ (unmapped memory), Kernel sẽ gửi tín hiệu `SIGSEGV` làm chương trình bị chấm dứt và dump core.
 
-### 4.2\. Đọc Bộ Nhớ (Memory Inspection)
+### 2\. Đọc Bộ Nhớ (Memory Inspection)
 
 * **Rút hầm Stack (Dump Stack):** Sử dụng `%08x.%08x.%08x.%08x` để in các giá trị 4-byte trên Stack từ vị trí con trỏ hiện tại đi ngược lên top của Stack.
 * **Đọc địa chỉ bất kỳ (Arbitrary Memory Read):** Chèn địa chỉ mục tiêu vào đầu chuỗi định dạng, sử dụng chuỗi `%08x` để đẩy con trỏ Stack nội bộ của hàm `printf` đến đúng vị trí chuỗi định dạng, sau đó dùng `%s` để đọc nội dung tại địa chỉ đó.
@@ -59,7 +59,7 @@ Payload: \x10\x01\x48\x08_%08x.%08x.%08x.%08x.%08x|%s|
 
 Payload trên sẽ đọc chuỗi ASCIIZ từ địa chỉ `0x08480110` cho đến khi gặp byte NUL (`\x00`).
 
-### 4.3\. Ghi Bộ Nhớ Bất Kỳ (Arbitrary Memory Write)
+### 3\. Ghi Bộ Nhớ Bất Kỳ (Arbitrary Memory Write)
 
 Sử dụng đặc tả `%n` để ghi số lượng ký tự đã in vào địa chỉ chỉ định trên Stack.
 
@@ -87,7 +87,7 @@ Payload hoàn chỉnh trên Stack gồm 3 thành phần chính theo thứ tự:
 2. **Dummy-Addr Pairs:** 4 cặp địa chỉ ghi tăng dần 1 byte (kèm các byte đệm rác không chứa NUL byte).
 3. **Write Code:** Các cặp `%nu%n` tương ứng để điều khiển byte thấp của bộ đếm và thực thi ghi vào địa chỉ.
 
-## 5\. Kỹ Thuật Ghi Đè &amp; Mục Tiêu Thay Thế (Alternative Targets)
+## \. Kỹ Thuật Ghi Đè &amp; Mục Tiêu Thay Thế (Alternative Targets)
 
 Thay vì chỉ tập trung ghi đè con trỏ trả về (Return Address) trên Stack vốn dễ bị thay đổi theo môi trường, việc khai thác lỗ hổng chuỗi định dạng cho phép ghi vào bất kỳ vùng nhớ có quyền ghi nào trong không gian tiến trình.
 
@@ -106,9 +106,9 @@ Các mục tiêu ghi đè chiến lược được tổng hợp trong bảng sau
 Khi bộ nhớ Stack bị chặn quyền thi hành (Non-executable Stack / PaX patch), kẻ tấn công ghi đè địa chỉ GOT của một hàm (ví dụ `fopen`) bằng địa chỉ hàm thư viện `system()`. Khi tiến trình gọi `fopen(user_buf)`, chuỗi câu lệnh hệ thống chứa trong `user_buf` (ví dụ: `cd /tmp; cp /bin/sh .; chmod 4777 sh; exit;`) sẽ được chuyển thẳng cho `system()` thực thi.
 
 ---
-## 6\. Biến Thể Tối Ưu Payload &amp; Khai Thác Trên Heap
+## \. Biến Thể Tối Ưu Payload &amp; Khai Thác Trên Heap
 
-### 6.1\. Short Write (`%hn`)
+### 1\. Short Write (`%hn`)
 
 Sử dụng cờ `%hn` để ghi dữ liệu kiểu `short int` (2 byte) trong một lần ghi.
 
@@ -116,7 +116,7 @@ Sử dụng cờ `%hn` để ghi dữ liệu kiểu `short int` (2 byte) trong m
 * **Ưu điểm:** Chỉ cần 2 lần ghi thay vì 4 lần; không làm hỏng các dữ liệu nằm liền sau địa chỉ ghi.
 * **Hạn chế:** Phụ thuộc vào khả năng chịu đựng bộ đếm vượt ngưỡng của thư viện C (không tương thích libc5 cũ).
 
-### 6.2\. Direct Parameter Access (`%$`)
+### 2\. Direct Parameter Access (`%$`)
 
 Cho phép truy cập trực tiếp tham số thứ `n` trên Stack mà không cần chuỗi Stackpop dài.
 
@@ -124,7 +124,7 @@ Cho phép truy cập trực tiếp tham số thứ `n` trên Stack mà không c�
 * **Payload ghi trực tiếp:** `printf("%1$16u%2$n%1$16u%3$n%1$32u%4$n%1$64u%5$n", 1, &amp;foo[0], &amp;foo[1], &amp;foo[2], &amp;foo[3]);`
 * **Giới hạn nền tảng:** BSD giới hạn trong 8 tham số đầu; Solaris C Library giới hạn 30 tham số đầu.
 
-### 6.3\. Khai Thác Chuỗi Định Dạng Trên Heap
+### 3\. Khai Thác Chuỗi Định Dạng Trên Heap
 
 Khi chuỗi định dạng nằm trên Heap thay vì Stack, con trỏ Stack của hàm `printf` không thể trỏ trực tiếp vào chính chuỗi định dạng.
 
@@ -132,11 +132,11 @@ Khi chuỗi định dạng nằm trên Heap thay vì Stack, con trỏ Stack củ
 * **Giải pháp 2 (Alternative Stack Data):** Lợi dụng các trường dữ liệu khác lưu trên Stack (như trường Password trong dịch vụ FTP) để chứa dữ liệu hoặc Shellcode.
 
 ---
-## 7\. Quy Trình Brute Force &amp; Công Cụ Hỗ Trợ
+## \. Quy Trình Brute Force &amp; Công Cụ Hỗ Trợ
 
 Trong trường hợp không xác định được offset chính xác của bộ nhớ, kẻ tấn công có thể áp dụng hai phương pháp Dò tìm tự động (Brute Force):
 
-### 7.1\. Response-Based Brute Force (Dò tìm dựa trên phản hồi)
+### 1\. Response-Based Brute Force (Dò tìm dựa trên phản hồi)
 
 Áp dụng khi kẻ tấn công nhìn thấy kết quả đầu ra của hàm định dạng (ví dụ dịch vụ FTP):
 
@@ -144,14 +144,14 @@ Trong trường hợp không xác định được offset chính xác của bộ
 2. **Căn chỉnh (Alignment):** Nếu không xuất hiện mẫu `41414141`, thêm từ 1 đến 3 byte rác vào đầu chuỗi để căn chỉnh biên 4-byte.
 3. **Xác định địa chỉ Buffer (Buffer Address):** Gửi `addr|stackpop|___%%|%s|`. Nếu `addr` trỏ đúng vào chuỗi đệm, kết quả sẽ in ra 2 ký tự `%` liên tiếp thay vì 1 ký tự `%`.
 
-### 7.2\. Blind Brute Force (Dò tìm mù)
+### 2\. Blind Brute Force (Dò tìm mù)
 
 Áp dụng cho các tiến trình chạy ngầm (Daemon) ghi log qua `syslog` không trả phản hồi trực tiếp:
 
 * Đo thời gian xử lý của server khi truyền các tham số tính toán lớn như `%.9999999u`.
 * Tạo lỗi Segment Fault chủ động bằng cờ `%n` trỏ tới địa chỉ không hợp lệ để xác định ranh giới bộ nhớ.
 
-### 7.3\. Các Công Cụ Hỗ Trợ Phân Tích
+### 3\. Các Công Cụ Hỗ Trợ Phân Tích
 
 * `ltrace`: Theo dõi và ghi lại tham số của các hàm thư viện động (`printf`, `strcpy`, `syslog`), giúp tìm địa chỉ chuỗi định dạng nhanh chóng.
 * `strace`: Theo dõi các lời gọi hệ thống (System Calls), hỗ trợ tìm địa chỉ các bộ đệm đọc dữ liệu đầu vào.
